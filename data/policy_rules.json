@@ -1,0 +1,67 @@
+{
+  "_comment": "Compiled from current source docs only (never from deprecated v2). Each rule cites the doc_id/section it was compiled from, so calculator output can show its provenance. Do not hand-edit without updating the source doc first.",
+
+  "default_cancellation": {
+    "source": "cancellation_sop_v4 \u00a71",
+    "DRAFT": { "cancellable": true, "fee_inr": 0 },
+    "BOOKED": {
+      "cancellable": true,
+      "free_window_minutes": 30,
+      "fee_after_window_inr": 250
+    },
+    "PICKED_UP": { "cancellable": false, "note": "Use return-to-origin workflow instead." },
+    "DELIVERED": { "cancellable": false, "note": "Cannot be cancelled." }
+  },
+
+  "default_service_credit": {
+    "source": "cancellation_sop_v4 \u00a72-3",
+    "threshold_hours_late": 2,
+    "credit_formula": "min(500, 0.10 * shipment_fee_inr)",
+    "requires_carrier_fault": true,
+    "requires_no_customer_fault": true,
+    "manager_approval_above_inr": 1000
+  },
+
+  "default_sla": {
+    "source": "support_policy_v3 \u00a73",
+    "Enterprise": { "P1": "30 minutes, 24x7", "P2": "2 hours", "P3": "1 business day" },
+    "Growth": { "P1": "2 business hours", "P2": "4 business hours", "P3": "2 business days" },
+    "Standard": { "P1": "4 business hours", "P2": "1 business day", "P3": "2 business days" }
+  },
+
+  "account_overrides": {
+    "ACCT-001": {
+      "source": "northstar_agreement",
+      "cancellation": {
+        "BOOKED": {
+          "cancellable": true,
+          "free_window_minutes": null,
+          "fee_after_window_inr": 0,
+          "note": "Fee fully waived pre-pickup, no time limit. PICKED_UP rule is NOT overridden \u2014 still falls back to default (not cancellable, use return-to-origin)."
+        }
+      },
+      "service_credit": {
+        "monthly_aggregate_cap_inr": 5000,
+        "note": "Per-incident formula/threshold NOT overridden \u2014 default SOP formula still applies, only the monthly cap changes."
+      },
+      "sla": { "P1": "15 minutes, 24x7", "P2": "1 hour", "P3": "8 business hours" }
+    },
+    "ACCT-002": {
+      "source": "lumenworks_agreement",
+      "cancellation": {
+        "note": "Explicitly NOT overridden. Use default_cancellation as-is."
+      },
+      "service_credit": {
+        "threshold_hours_late": 4,
+        "credit_formula": "300",
+        "note": "Flat INR 300 credit, threshold raised to >4 hours. Replaces default amount and threshold."
+      },
+      "sla": {
+        "P1": "2 business hours",
+        "P2": "4 business hours",
+        "P3": "2 business days",
+        "coverage_note": "No weekend or after-hours support coverage."
+      }
+    }
+  }
+}
